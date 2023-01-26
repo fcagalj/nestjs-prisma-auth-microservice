@@ -8,6 +8,7 @@ import {
   DepartmentSSResponse,
   SubDepartmentSSResponse,
 } from '../services/statistics.service';
+import { CreateEmployeeDto } from '../dto/create-employee.dto';
 
 @Controller()
 export class AppController {
@@ -43,14 +44,7 @@ export class AppController {
   @Post('employee')
   async createEmployee(
     @Body()
-    employeeData: {
-      name: string;
-      salary: number;
-      currency: string;
-      department: string;
-      subDepartment: string;
-      onContract?: boolean;
-    },
+    employeeData: CreateEmployeeDto,
   ): Promise<EmployeeModel> {
     const { name, salary, currency, department, subDepartment, onContract } =
       employeeData;
