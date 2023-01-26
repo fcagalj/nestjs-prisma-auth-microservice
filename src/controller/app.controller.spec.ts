@@ -16,6 +16,7 @@ const dropDatabase = () => {
 };
 
 beforeAll(async () => {
+  // Auth not needed for these tests
   const module: TestingModule = await Test.createTestingModule({
     providers: [PrismaService, EmployeeService, StatisticsService],
     controllers: [AppController],

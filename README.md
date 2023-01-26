@@ -47,6 +47,14 @@ curl --location --request POST 'http://localhost:3000/employee/' \
     "subDepartment": "Platform"
 }'
 ```
+
+### Remove employee record
+
+```bash
+curl --location --request DELETE 'http://localhost:3000/employee/4' \
+--data-raw ''
+```
+
 ### Get Summary Statistics (min, max, mean) for all employees
 
 ```bash
