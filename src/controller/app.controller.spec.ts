@@ -6,7 +6,6 @@ import { AppController } from './app.controller';
 import { PrismaService } from '../services/prisma.service';
 import { EmployeeService } from '../services/employee.service';
 import { StatisticsService } from '../services/statistics.service';
-import { UserService } from '../services/user.service';
 
 let app: INestApplication;
 let controller: AppController;
@@ -18,7 +17,7 @@ const dropDatabase = () => {
 
 beforeAll(async () => {
   const module: TestingModule = await Test.createTestingModule({
-    providers: [PrismaService, UserService, EmployeeService, StatisticsService],
+    providers: [PrismaService, EmployeeService, StatisticsService],
     controllers: [AppController],
   }).compile();
   app = module.createNestApplication();

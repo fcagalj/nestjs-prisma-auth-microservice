@@ -11,3 +11,5 @@ services:
       - ./:/app
     environment:
       - DATABASE_URL=file:/etc/db/employees.db
+      - SECRETKEY=myUnsafeLocalSecret
+      - EXPIRESIN=60d

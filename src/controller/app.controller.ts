@@ -1,5 +1,12 @@
-import { Controller, Get, Post, Param, Body, Delete } from '@nestjs/common';
-import { UserService } from '../services/user.service';
+import {
+  Controller,
+  Get,
+  Post,
+  Param,
+  Body,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { EmployeeService } from '../services/employee.service';
 import { Employee as EmployeeModel } from '@prisma/client';
 import {
@@ -9,11 +16,11 @@ import {
   SubDepartmentSSResponse,
 } from '../services/statistics.service';
 import { CreateEmployeeDto } from '../dto/create-employee.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller()
 export class AppController {
   constructor(
-    private readonly userService: UserService,
     private readonly employeeService: EmployeeService,
     private readonly statisticsService: StatisticsService,
   ) {}
@@ -42,6 +49,7 @@ export class AppController {
   }
 
   @Post('employee')
+  @UseGuards(JwtAuthGuard)
   async createEmployee(
     @Body()
     employeeData: CreateEmployeeDto,
