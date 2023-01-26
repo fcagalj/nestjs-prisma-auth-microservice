@@ -145,4 +145,44 @@ describe('AppController', () => {
     expect(engineeringDepartmentRes.statisticSummary.min).toEqual(min);
     expect(engineeringDepartmentRes.statisticSummary.mean).toEqual(mean);
   });
+
+  it('can calculate summary statistics for departments (mean, min, max)', async () => {
+    await createEmployees(employeesJson);
+
+    const res = await controller.getSSForSubDepartments();
+
+    const engineeringPlatformSubDepartmentInput = employeesJson.filter(
+      (e) => e.department === 'Engineering' && e.sub_department === 'Platform',
+    );
+
+    const engineeringPlatformDepartmentRes = res.find(
+      (e) => e.name === 'Engineering',
+    );
+    const engineeringPlatformDepartmentResSubDepartment =
+      engineeringPlatformDepartmentRes.subDepartments.find(
+        (e) => e.name === 'Platform',
+      );
+    const min = engineeringPlatformSubDepartmentInput.reduce(
+      (min, employee) => Math.min(min, Number(employee.salary)),
+      Number(engineeringPlatformSubDepartmentInput[0].salary),
+    );
+    const max = engineeringPlatformSubDepartmentInput.reduce(
+      (max, employee) => Math.max(max, Number(employee.salary)),
+      Number(engineeringPlatformSubDepartmentInput[0].salary),
+    );
+    const sum = engineeringPlatformSubDepartmentInput.reduce(
+      (sum, employee) => sum + Number(employee.salary),
+      0,
+    );
+    const mean = sum / engineeringPlatformSubDepartmentInput.length;
+    expect(
+      engineeringPlatformDepartmentResSubDepartment.statisticSummary.max,
+    ).toEqual(max);
+    expect(
+      engineeringPlatformDepartmentResSubDepartment.statisticSummary.min,
+    ).toEqual(min);
+    expect(
+      engineeringPlatformDepartmentResSubDepartment.statisticSummary.mean,
+    ).toEqual(mean);
+  });
 });

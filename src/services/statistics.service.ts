@@ -13,7 +13,8 @@ export type DepartmentSSResponse = {
   statisticSummary: StatisticsSummary;
 };
 
-export type SubDepartmentSSResponse = DepartmentSSResponse & {
+export type SubDepartmentSSResponse = {
+  name: string;
   subDepartments: DepartmentSSResponse[];
 };
 
@@ -95,7 +96,8 @@ export class StatisticsService {
   }
 
   async getSSForSubDepartments(): Promise<SubDepartmentSSResponse[]> {
-    const aggregations = await this.prisma.employee.groupBy({
+    // TODO: this query can be optimized, out of the current scope
+    const departments = await this.prisma.employee.groupBy({
       by: ['department', 'sub_department'],
       _avg: {
         salary: true,
@@ -108,20 +110,32 @@ export class StatisticsService {
       },
     });
 
-    console.log(
-      `--> 
-    aggregations:: `,
-      aggregations,
-    );
+    // more elegant would be to use lodash groupBy here
+    const groupedDepartments = {};
+    departments.forEach((department) => {
+      if (!groupedDepartments[department.department]) {
+        groupedDepartments[department.department] = [];
+      }
+      groupedDepartments[department.department].push(department);
+    });
 
-    return [
-      {
-        name: 'test',
-        statisticSummary: { min: 1, max: 2, mean: 3 },
-        subDepartments: [
-          { name: 'test', statisticSummary: { min: 1, max: 2, mean: 3 } },
-        ],
-      },
-    ];
+    return Object.values(groupedDepartments).map((departmentsGroup) => {
+      return {
+        name: departmentsGroup[0].department,
+        // TODO: fix typings
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        subDepartments: departmentsGroup.map((subDepartment) => {
+          return {
+            name: subDepartment.sub_department,
+            statisticSummary: {
+              min: subDepartment._min.salary || 0,
+              max: subDepartment._max.salary || 0,
+              mean: subDepartment._avg.salary || 0,
+            },
+          };
+        }),
+      };
+    });
   }
 }
