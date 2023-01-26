@@ -12,6 +12,10 @@ let app: INestApplication;
 let controller: AppController;
 let prisma: PrismaService;
 
+const dropDatabase = () => {
+  return Promise.all([prisma.employee.deleteMany(), prisma.user.deleteMany()]);
+};
+
 beforeAll(async () => {
   const module: TestingModule = await Test.createTestingModule({
     providers: [PrismaService, UserService, EmployeeService, StatisticsService],
@@ -42,10 +46,6 @@ const createEmployees = async (employees) => {
       createEmployee(createEmployeeInput),
     ),
   );
-};
-
-const dropDatabase = () => {
-  return Promise.all([prisma.employee.deleteMany(), prisma.user.deleteMany()]);
 };
 
 describe('AppController', () => {
@@ -91,5 +91,58 @@ describe('AppController', () => {
     expect(res.max).toEqual(max);
     expect(res.min).toEqual(min);
     expect(res.mean).toEqual(mean);
+  });
+
+  it('can calculate summary statistics for contractors (mean, min, max)', async () => {
+    await createEmployees(employeesJson);
+
+    const res = await controller.getSSForContractors();
+
+    const contractors = employeesJson.filter((e) => e.on_contract);
+
+    const min = contractors.reduce(
+      (min, employee) => Math.min(min, Number(employee.salary)),
+      Number(contractors[0].salary),
+    );
+    const max = contractors.reduce(
+      (max, employee) => Math.max(max, Number(employee.salary)),
+      Number(contractors[0].salary),
+    );
+    const sum = contractors.reduce(
+      (sum, employee) => sum + Number(employee.salary),
+      0,
+    );
+    const mean = sum / contractors.length;
+    expect(res.max).toEqual(max);
+    expect(res.min).toEqual(min);
+    expect(res.mean).toEqual(mean);
+  });
+
+  it('can calculate summary statistics for departments (mean, min, max)', async () => {
+    await createEmployees(employeesJson);
+
+    const res = await controller.getSSForDepartments();
+
+    const engineeringDepartmentInput = employeesJson.filter(
+      (e) => e.department === 'Engineering',
+    );
+
+    const engineeringDepartmentRes = res.find((e) => e.name === 'Engineering');
+    const min = engineeringDepartmentInput.reduce(
+      (min, employee) => Math.min(min, Number(employee.salary)),
+      Number(engineeringDepartmentInput[0].salary),
+    );
+    const max = engineeringDepartmentInput.reduce(
+      (max, employee) => Math.max(max, Number(employee.salary)),
+      Number(engineeringDepartmentInput[0].salary),
+    );
+    const sum = engineeringDepartmentInput.reduce(
+      (sum, employee) => sum + Number(employee.salary),
+      0,
+    );
+    const mean = sum / engineeringDepartmentInput.length;
+    expect(engineeringDepartmentRes.statisticSummary.max).toEqual(max);
+    expect(engineeringDepartmentRes.statisticSummary.min).toEqual(min);
+    expect(engineeringDepartmentRes.statisticSummary.mean).toEqual(mean);
   });
 });

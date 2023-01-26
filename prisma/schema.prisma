@@ -19,7 +19,7 @@ model User {
 model Employee {
   id             Int      @default(autoincrement()) @id
   name           String
-  salary         String
+  salary         Float
   currency       String
   department     String
   sub_department String

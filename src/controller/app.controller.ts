@@ -3,8 +3,10 @@ import { UserService } from '../services/user.service';
 import { EmployeeService } from '../services/employee.service';
 import { Employee as EmployeeModel } from '@prisma/client';
 import {
-  StatisticsRes,
+  StatisticsSummary,
   StatisticsService,
+  DepartmentSSResponse,
+  SubDepartmentSSResponse,
 } from '../services/statistics.service';
 
 @Controller()
@@ -43,7 +45,7 @@ export class AppController {
     @Body()
     employeeData: {
       name: string;
-      salary: string;
+      salary: number;
       currency: string;
       department: string;
       subDepartment: string;
@@ -68,17 +70,22 @@ export class AppController {
     return this.employeeService.deleteEmployee({ id: Number(id) });
   }
   @Get('statistic-all')
-  async getSSForAll(): Promise<StatisticsRes> {
+  async getSSForAll(): Promise<StatisticsSummary> {
     return this.statisticsService.getSSForAll();
   }
 
+  @Get('statistic-contractors')
+  async getSSForContractors(): Promise<StatisticsSummary> {
+    return this.statisticsService.getSSForContractors();
+  }
+
   @Get('statistic-departments')
-  async getSSForDepartments(): Promise<StatisticsRes[]> {
+  async getSSForDepartments(): Promise<DepartmentSSResponse[]> {
     return this.statisticsService.getSSForDepartments();
   }
 
   @Get('statistic-subdepartments')
-  async getSSForSubDepartments(): Promise<StatisticsRes[]> {
+  async getSSForSubDepartments(): Promise<SubDepartmentSSResponse[]> {
     return this.statisticsService.getSSForSubDepartments();
   }
 }

@@ -1,13 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
-import { Employee } from '@prisma/client';
 import { EmployeeService } from './employee.service';
 
-export type StatisticsRes = {
+export type StatisticsSummary = {
   min: number;
   max: number;
   mean: number;
 };
+
+export type DepartmentSSResponse = {
+  name: string;
+  statisticSummary: StatisticsSummary;
+};
+
+export type SubDepartmentSSResponse = DepartmentSSResponse & {
+  subDepartments: DepartmentSSResponse[];
+};
+
 @Injectable()
 export class StatisticsService {
   constructor(
@@ -15,67 +24,104 @@ export class StatisticsService {
     private employeeService: EmployeeService,
   ) {}
 
-  async getSSForAll(): Promise<StatisticsRes> {
-    // TODO: Optimize query (out of the current scope)
-    const res = await this.employeeService.employees({});
-
-    return this.calculateSS(res);
+  async getSSForAll(): Promise<StatisticsSummary> {
+    const {
+      _avg: { salary: mean },
+      _min: { salary: min },
+      _max: { salary: max },
+    } = await this.prisma.employee.aggregate({
+      _avg: {
+        salary: true,
+      },
+      _min: {
+        salary: true,
+      },
+      _max: {
+        salary: true,
+      },
+    });
+    return { min: min || 0, max: max || 0, mean: mean || 0 };
   }
 
-  async getSSForContractors(): Promise<StatisticsRes> {
-    // TODO: Optimize query (out of the current scope)
-    const res = await this.employeeService.employees({
+  async getSSForContractors(): Promise<StatisticsSummary> {
+    const {
+      _avg: { salary: mean },
+      _min: { salary: min },
+      _max: { salary: max },
+    } = await this.prisma.employee.aggregate({
+      _avg: {
+        salary: true,
+      },
+      _min: {
+        salary: true,
+      },
+      _max: {
+        salary: true,
+      },
       where: {
         on_contract: true,
       },
     });
-
-    return this.calculateSS(res);
+    return { min: min || 0, max: max || 0, mean: mean || 0 };
   }
 
-  async getSSForDepartments(): Promise<StatisticsRes[]> {
-    // TODO: Optimize query (out of the current scope)
-    const res = await this.prisma.employee.groupBy({
+  async getSSForDepartments(): Promise<DepartmentSSResponse[]> {
+    const departments = await this.prisma.employee.groupBy({
       by: ['department'],
+      _avg: {
+        salary: true,
+      },
+      _min: {
+        salary: true,
+      },
+      _max: {
+        salary: true,
+      },
     });
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    return Object.values(res).map((employees) => this.calculateSS(employees));
+    return departments.map(
+      ({
+        department,
+        _avg: { salary: mean },
+        _min: { salary: min },
+        _max: { salary: max },
+      }) => {
+        return {
+          name: department,
+          statisticSummary: { min: min || 0, max: max || 0, mean: mean || 0 },
+        };
+      },
+    );
   }
 
-  async getSSForSubDepartments(): Promise<StatisticsRes[]> {
-    // TODO: Optimize query (out of the current scope)
-    const res = await this.prisma.employee.groupBy({
-      by: ['department'],
+  async getSSForSubDepartments(): Promise<SubDepartmentSSResponse[]> {
+    const aggregations = await this.prisma.employee.groupBy({
+      by: ['department', 'sub_department'],
+      _avg: {
+        salary: true,
+      },
+      _min: {
+        salary: true,
+      },
+      _max: {
+        salary: true,
+      },
     });
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    return Object.values(res).map((employees) => this.calculateSS(employees));
-  }
+    console.log(
+      `--> 
+    aggregations:: `,
+      aggregations,
+    );
 
-  calculateSS(employees: Employee[]): StatisticsRes {
-    let min = Number(employees[0].salary);
-    let max = Number(employees[0].salary);
-    let sum = 0;
-    for (let i = 0; i < employees.length; i++) {
-      const salary = Number(employees[i].salary);
-      if (salary < min) {
-        min = salary;
-      }
-      if (salary > max) {
-        max = salary;
-      }
-      sum += salary;
-    }
-
-    const mean = sum / employees.length;
-
-    return {
-      min,
-      max,
-      mean,
-    };
+    return [
+      {
+        name: 'test',
+        statisticSummary: { min: 1, max: 2, mean: 3 },
+        subDepartments: [
+          { name: 'test', statisticSummary: { min: 1, max: 2, mean: 3 } },
+        ],
+      },
+    ];
   }
 }
