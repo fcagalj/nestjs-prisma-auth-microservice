@@ -3,7 +3,7 @@ version: "3.7"
 services:
   app:
     image: node:18-alpine
-    command: sh -c "yarn install && yarn prisma migrate dev --name init && yarn start:debug"
+    command: sh -c "npm install && npm uninstall bcrypt && npm install bcrypt && npx prisma migrate dev --name init && npm run start:debug"
     ports:
       - 3000:3000
     working_dir: /app

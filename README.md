@@ -92,7 +92,7 @@ curl --location --request GET 'http://localhost:3000/statistic-subdepartments' \
 ## Installation
 
 ```bash
-$ yarn install
+$ npm install
 ```
 
 ## Running the app
@@ -111,7 +111,7 @@ Run tests within the docker container!
 
 ```bash
 # unit tests
-$ yarn test
+$ npm run test
 
 # e2e tests
 not implemented
