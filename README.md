@@ -1,7 +1,7 @@
-# Clipboard Health - Coding Exercise
+# NestJS microservice
 
 ## Description
-Clipboard Health coding exercise, sample NestJS microservice with Prisma ORM and SQLite database. Microservice expose 
+Sample NestJS microservice with Prisma ORM and SQLite database. Microservice expose 
 REST API for CRUD operations on the database, and require user login to access API.
 
 ## API
