@@ -4,6 +4,40 @@
 Sample NestJS microservice with Prisma ORM and SQLite database. Microservice expose 
 REST API for CRUD operations on the database, and require user login to access API.
 
+## Technologies
+
+- [Nest](https://github.com/nestjs/nest)
+- [Prisma ORM](https://www.prisma.io/)
+- SQLite
+- Docker
+
+## Installation
+
+```bash
+$ npm install
+```
+
+## Running the app
+
+```bash
+# development
+$ docker-compose up
+
+# production mode
+not implemented
+```
+
+## Test
+
+Run tests within the docker container!
+
+```bash
+# unit tests
+$ npm run test
+
+# e2e tests
+not implemented
+```
 ## API
 
 Before accessing the API, you need to login to the service. Login endpoint is not protected, and returns JWT token that 
@@ -83,44 +117,9 @@ curl --location --request GET 'http://localhost:3000/statistic-subdepartments' \
 --data-raw ''
 ```
 
-## Technologies
-
-- [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-- [Prisma ORM](https://www.prisma.io/) for database access. 
-- SQLite  
-
-## Installation
-
-```bash
-$ npm install
-```
-
-## Running the app
-
-```bash
-# development
-$ docker-compose up
-
-# production mode
-not implemented
-```
-
-## Test
-
-Run tests within the docker container!
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-not implemented
-```
-
 ## Author
 
 Frane Cagalj
 - [LinkedIn](https://www.linkedin.com/in/frane-cagalj)
 - [GitHub](https://github.com/fcagalj)
 - [Twitter](https://twitter.com/fcagalj)
-- [CV](https://docs.google.com/document/d/1bxLE7zjZpd6YsHXlwznFKo00tl1r-EPBudBQ_py-P00)
